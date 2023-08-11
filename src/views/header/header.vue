@@ -14,7 +14,7 @@
           content="参考线"
           placement="bottom"
         >
-        <el-switch v-model="guides" />
+          <el-switch v-model="guides" />
         </el-tooltip>
         <el-divider direction="vertical" />
         <div class="revocation">
@@ -37,13 +37,14 @@ const guides = ref(false)
   
 <style lang="scss" scoped>
   .editor-header {
-    height: 50px;
+    height: $headerHeight;
     padding: 0 20px;
     background: #fff;
     display: flex;
     align-items: center;
     justify-content: space-between;
     border-bottom: 1px solid #ddd;
+    z-index: 10;
     .left,
     .right {
       flex: 1;

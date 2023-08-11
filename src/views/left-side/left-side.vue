@@ -1,33 +1,39 @@
 <template>
   <div class="left-side">
-    <div class="icon-wrap">
-      <img src="@/assets/images/rectangle.png" alt="">
-      <img src="@/assets/images/cut.png" alt="">
-      <img src="@/assets/images/text.png" alt="">
-    </div>
+    <OperationList
+      @open-brush-style="openBrushStyle"
+    />
+    <transition
+      enter-active-class="animate__animated animate__slideInLeft"
+      leave-active-class="animate__animated animate__slideOutLeft"
+    >
+      <BrushStyle 
+        v-show="showBrushStyle"
+        @close-brush-style="closeBrushStyle"
+      />
+    </transition>
   </div>
 </template>
   
 <script setup lang='ts'>
-  
+import OperationList from './components/operation-list.vue'
+import BrushStyle from './components/brush-style.vue'
+
+const showBrushStyle = ref(false)
+const openBrushStyle = () => {
+  showBrushStyle.value = true
+}
+const closeBrushStyle = () => {
+  showBrushStyle.value = false
+}
+
 </script>
   
 <style lang="scss" scoped>
   .left-side {
-    background: #fff;
     height: 100%;
-    .icon-wrap {
-      margin-top: 20px;
-      height: 100%;
-      width: 50px;
-      display: flex;
-      flex-direction: column;
-      gap: 20px;
-      align-items: center;
-      img { 
-        width: 20px;
-        cursor: pointer;
-      }
-    }
+    position: fixed;
+    left: 0;
+    z-index: 10;
   }
 </style>

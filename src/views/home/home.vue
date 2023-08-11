@@ -3,21 +3,23 @@
     <Header />
     <div class="layout-main">
       <LeftSide />
-      <Workspace />
-      <RightSide />
+      <MainComponent
+      />
+      <RightSide
+      />
     </div>
   </div>
 </template>
 <script setup lang="ts">
 import Header from '../header/header.vue'
 import LeftSide from '../left-side/left-side.vue'
-import Workspace from '../workspace/workspace.vue'
+import MainComponent from '../main/index.vue'
 import RightSide from '../right-side/right-side.vue'
 
 </script>
 <style lang="scss" scoped>
   .h5-editor {
-    background: #f5f7f9;
+    background: #dadada;
     width: 100%;
     height: 100%;
   }

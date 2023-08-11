@@ -3,8 +3,8 @@ import { createPinia } from 'pinia'
 import App from './App.vue'
 import router from './router/index'
 import 'element-plus/theme-chalk/src/common/var.scss'
-import './assets/styles/index.scss'
-
+import '@/assets/styles/index.scss'
+import 'animate.css'
 import ElementPlus from 'element-plus'
 import zhCn from 'element-plus/dist/locale/zh-cn.mjs'
 

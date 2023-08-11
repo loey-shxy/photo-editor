@@ -35,19 +35,24 @@ export default defineConfig(({ command, mode }) => {
         '@components': resolve(__dirname, './src/components')
       },
     },
-    // css: {
-    //   postcss: {
-    //     plugins: [
-    //       postCssToViewpoint({
-    //         viewportWidth: 1920, // 设计稿视口宽度
-    //         unitPrecision: 6, // 转换后保留的精度
-    //         unitToConvert: 'px', // 需要转换的单位
-    //         propList: ['*'],
-    //         viewportUnit: 'vw', // 希望使用的视口单位
-    //         fontViewportUnit: 'vw' // 字体使用的视口单位
-    //       })
-    //     ]
-    //   }
-    // }
+    css: {
+      preprocessorOptions: {
+        scss: {
+          additionalData: '@use "@/assets/styles/var.scss" as *;'
+        }
+      }
+      // postcss: {
+        // plugins: [
+        //   postCssToViewpoint({
+        //     viewportWidth: 1920, // 设计稿视口宽度
+        //     unitPrecision: 6, // 转换后保留的精度
+        //     unitToConvert: 'px', // 需要转换的单位
+        //     propList: ['*'],
+        //     viewportUnit: 'vw', // 希望使用的视口单位
+        //     fontViewportUnit: 'vw' // 字体使用的视口单位
+        //   })
+        // ]
+      // }
+    }
   }
 })
