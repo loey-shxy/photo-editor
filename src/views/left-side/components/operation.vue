@@ -2,7 +2,7 @@
   <div class="icon-wrap">
     <div 
       v-for="item in OPERATION"
-      :class="['icon-item', active === item.v && 'active']" 
+      :class="['icon-item cursor-pointer', active === item.v && 'active']" 
       @click="changeOperation(item.v)"
     >
       <el-tooltip
@@ -20,18 +20,14 @@
   
 <script setup lang='ts'>
 import { OPERATION } from '@/common/constants'
-const active = ref('')
-const emits = defineEmits(['open-brush-style'])
+import { usePosterStore } from '@/store/poster'
+const posterStore = usePosterStore()
+const active = ref(posterStore.activity)
+const emits = defineEmits(['open-panel'])
 const changeOperation = (type: string) => {
   active.value = type
-  switch (type) {
-    case OPERATION.BRUSH.v:
-      emits('open-brush-style')
-      break;
-  
-    default:
-      break;
-  }
+  posterStore.changeActivity(active.value)
+  emits('open-panel')
 }
 </script>
   
@@ -55,15 +51,14 @@ const changeOperation = (type: string) => {
     width: 100%;
     text-align: center;
     padding: 10px 0;
-    cursor: pointer;
     .icon {
       width: 20px;
       height: 20px;
       background-size: cover;
       margin: 0 auto;
     }
-    .icon-rectangle {
-      background-image: url('@/assets/images/rectangle.png');
+    .icon-form {
+      background-image: url('@/assets/images/form.png');
     }
     .icon-cut {
       background-image: url('@/assets/images/cut.png');
@@ -77,8 +72,8 @@ const changeOperation = (type: string) => {
     &.active,
     &:hover {
       background: var(--el-color-primary);
-      .icon-rectangle {
-        background-image: url('@/assets/images/rectangle-white.png');
+      .icon-form {
+        background-image: url('@/assets/images/form-white.png');
       }
       .icon-cut {
         background-image: url('@/assets/images/cut-white.png');

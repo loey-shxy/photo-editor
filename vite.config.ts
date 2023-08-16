@@ -6,7 +6,8 @@ import AutoImport from 'unplugin-auto-import/vite'
 import { ElementPlusResolver } from 'unplugin-vue-components/resolvers'
 import Components from 'unplugin-vue-components/vite'
 import postCssToViewpoint from 'postcss-px-to-viewport'
-import Icons from "unplugin-icons/vite";
+import Icons from 'unplugin-icons/vite';
+import { imageRequirePlugin } from 'vite-plugin-image-require'
 
 // https://vitejs.dev/config/
 export default defineConfig(({ command, mode }) => {
@@ -26,6 +27,7 @@ export default defineConfig(({ command, mode }) => {
         autoInstall: true,
         compiler: "vue3",
       }),
+      // imageRequirePlugin({})
     ],
     resolve: {
       alias: {

@@ -12,45 +12,36 @@
           </el-form-item>
         </el-form>
       </div>
-      <div class="background-color_wrap">
-        <el-divider content-position="left">颜色</el-divider>
+      <div>
+        <el-divider content-position="left">背景颜色</el-divider>
         <div class="demo-color-block">
-          <el-form label-width="80px">
-            <el-form-item label="颜色">
-              <el-color-picker v-model="brushColor" @change="canvasColorChange" />
-            </el-form-item>
-            <el-form-item label="背景颜色">
-              <el-color-picker v-model="backgroundColor" @change="canvasBgColorChange" />
-            </el-form-item>
-          </el-form>
+          <el-color-picker v-model="backgroundColor" @change="changeBackgroundColor" />
         </div>
+      </div>
+      <div>
+        <el-divider content-position="left">图层</el-divider>
       </div>
     </div>
   </div>
 </template>
   
 <script setup lang='ts'>
-import { usePosterStore } from '@/store/poster'
+import { useCanvasStore } from '@/store/canvas'
 
-const poster = usePosterStore()
+const canvasStore = useCanvasStore()
 const size = reactive({
-  width: poster.canvasSize.width,
-  height: poster.canvasSize.height
+  width: canvasStore.canvasSize.width,
+  height: canvasStore.canvasSize.height
 })
-
-const brushColor = ref(poster.brushColor)
-const backgroundColor = ref(poster.backgroundColor)
-
 const canvasSizeChange = () => {
-  poster.changeSize(size)
+  canvasStore.changeSize(size)
 }
 
-const canvasColorChange = () => {
-  poster.changeColor(brushColor.value)
-}
 
-const canvasBgColorChange = () => {
-  poster.changeBgColor(backgroundColor.value)
+
+const backgroundColor = ref(canvasStore.backgroundColor)
+const changeBackgroundColor = () => {
+  canvasStore.changeBgColor(backgroundColor.value)
 }
 </script>
   
