@@ -1,7 +1,14 @@
 import { defineStore } from 'pinia'
 
+interface ILineStore {
+  lineColor: string
+  lineStyle: string
+  lineWidth: number
+  lineCap: string
+}
+
 export const useLineStore = defineStore('line', {
-  state: () => { 
+  state: (): ILineStore => { 
     return {
       lineColor: '#000', // 笔刷颜色
       lineStyle: 'solid', // 笔刷类型

@@ -13,6 +13,7 @@
 </template>
 <script setup lang='ts'>
 import { LINE_STYLES, OPERATION } from '@/common/constants'
+// import { IRectangle } from '@/interface/canvas'
 
 import { useLineStore } from '@/store/line'
 const lineStore = useLineStore()
@@ -23,6 +24,9 @@ const canvasStore = useCanvasStore()
 import { usePosterStore } from '@/store/poster'
 const posterStore = usePosterStore()
 
+import { useFormStore } from '@/store/form'
+const formStore = useFormStore()
+
 const canvas = ref<HTMLCanvasElement>()
 const ctx = ref<CanvasRenderingContext2D>()
 
@@ -31,6 +35,8 @@ const point = reactive({
   x: 0,
   y: 0
 })
+
+// let rectangleList = reactive<IRectangle[]>(formStore.rectangleList)
 
 onMounted(() => {
   nextTick(() => {
@@ -46,6 +52,8 @@ const initCanvas = () => {
   ctx.value = canvas.value.getContext('2d') as CanvasRenderingContext2D
 }
 
+// const resetDrawRectangle()
+
 /**
  * @description 画线
  * @param e 
@@ -57,14 +65,26 @@ const drawLine = (e: MouseEvent) => {
     ctx.value.lineCap = lineStore.lineCap as CanvasLineCap
     ctx.value.lineTo(e.offsetX, e.offsetY)
     if (lineStore.lineStyle === LINE_STYLES.DASHED.v) {
-      ctx.value.setLineDash([10, 10])
+      ctx.value.setLineDash([8, 4])
     }
     ctx.value.stroke()
   }
 }
 
+/**
+ * @description 绘制多边形
+ * @param e 
+ */
 const drawForm = (e: MouseEvent) => {
-// 
+  if (drawing.value && ctx.value) {
+    ctx.value.lineWidth = formStore.borderWidth
+    ctx.value.strokeStyle = formStore.borderColor
+    if (formStore.borderStyle === LINE_STYLES.DASHED.v) {
+      ctx.value.setLineDash([8, 4])
+    }
+    ctx.value.rect(point.x, point.y, e.offsetX - point.x, e.offsetY - point.y)
+    ctx.value.stroke()
+  }
 }
 
 /**
@@ -90,7 +110,7 @@ const mouseup = () => {
 
 const mousemove = (e: MouseEvent) => {
   switch(posterStore.activity) {
-    case OPERATION.BRUSH.v: // 画线条
+    case OPERATION.BRUSH.v:
       drawLine(e)
       break
     case OPERATION.FORM.v: 

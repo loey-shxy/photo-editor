@@ -1,8 +1,13 @@
 import { defineStore } from 'pinia'
 import { ICanvasSize } from '@/interface/canvas';
 
+interface ICanvasStore {
+  canvasSize: ICanvasSize
+  backgroundColor: string
+}
+
 export const useCanvasStore = defineStore('canvas', {
-  state: () => { 
+  state: (): ICanvasStore => { 
     return {
       canvasSize: { width: 338, height: 600 }, // 画布大小
       backgroundColor: '#fff', // 画布背景颜色

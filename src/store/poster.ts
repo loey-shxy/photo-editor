@@ -1,7 +1,11 @@
 import { defineStore } from 'pinia'
 
+interface IPosterStore {
+  activity: string
+}
+
 export const usePosterStore = defineStore('poster', {
-  state: () => { 
+  state: (): IPosterStore => { 
     return {
       activity: ''
     }
