@@ -7,8 +7,8 @@
           'flex align-items_center justify-content_center form-list_item cursor-pointer', 
           formStore.form === item.v && 'selected'
         ]"
-        v-for="item in FORM"
-        :key="item.v"
+        v-for="(item, index) in FORM"
+        :key="index"
         @click="changeForm(item.v)"
       >
         <img :src="getImg(item.v)" alt="">
@@ -53,11 +53,12 @@
   
 <script setup lang='ts'>
 import { FORM, LINE_STYLES } from '@/common/constants'
+import { IForm } from '@/interface/canvas';
 
 import { useFormStore } from '@/store/form'
 const formStore = useFormStore()
 
-const getImg = (name: string) => {
+const getImg = (name: IForm) => {
   switch(name) {
     case FORM.CIRCLE.v: return new URL('@/assets/images/circle.png', import.meta.url).href;
     case FORM.RECTANGLE.v: return new URL('@/assets/images/rectangle.png', import.meta.url).href;
@@ -67,7 +68,7 @@ const getImg = (name: string) => {
   }
 }
 
-const changeForm = (form: string) => {
+const changeForm = (form: IForm) => {
   formStore.changeForm(form)
 }
 

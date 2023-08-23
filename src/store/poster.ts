@@ -1,17 +1,18 @@
 import { defineStore } from 'pinia'
+import { IActivity } from '@/interface/canvas'
 
 interface IPosterStore {
-  activity: string
+  activity: IActivity
 }
 
 export const usePosterStore = defineStore('poster', {
   state: (): IPosterStore => { 
     return {
-      activity: ''
+      activity: null
     }
   },
   actions: {
-    changeActivity(activity: string) {
+    changeActivity(activity: IActivity) {
       this.activity = activity
     }
   }

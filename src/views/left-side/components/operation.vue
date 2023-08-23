@@ -20,11 +20,13 @@
   
 <script setup lang='ts'>
 import { OPERATION } from '@/common/constants'
+import { IActivity } from '@/interface/canvas'
 import { usePosterStore } from '@/store/poster'
 const posterStore = usePosterStore()
+
 const active = ref(posterStore.activity)
 const emits = defineEmits(['open-panel'])
-const changeOperation = (type: string) => {
+const changeOperation = (type: IActivity) => {
   active.value = type
   posterStore.changeActivity(active.value)
   emits('open-panel')
@@ -35,10 +37,7 @@ const changeOperation = (type: string) => {
 .icon-wrap {
   height: 100%;
   width: $leftOperationWidth;
-  position: absolute;
-  left: 0;
-  top: 0;
-  z-index: 6;
+  z-index: 1;
   background-color: #fff;
   display: flex;
   flex-direction: column;

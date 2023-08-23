@@ -1,30 +1,28 @@
-import { IRectangle } from '@/interface/canvas';
+import { IRectangle, IForm } from '@/interface/canvas';
 import { defineStore } from 'pinia'
 
 interface IFormStore {
-  form: string
+  form: IForm
   borderStyle: string
   borderWidth: number
   borderColor: string
   fillColor: string
-  rectangleList: IRectangle[]
 }
 
 export const useFormStore = defineStore('form', {
   state: (): IFormStore => {
     return {
-      form: '',
+      form: null,
       borderStyle: '',
       borderWidth: 1,
       borderColor: '#000',
-      fillColor: '#fff',
-      rectangleList: []
+      fillColor: '#fff'
     }
   },
 
   actions: {
     // 修改形状
-    changeForm(form: string) {
+    changeForm(form: IForm) {
       this.form = form
     },
     // 修改边框线条样式

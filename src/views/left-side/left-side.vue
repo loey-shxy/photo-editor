@@ -45,6 +45,7 @@ import Brush from './components/brush.vue'
 import Form from './components/form.vue'
 
 import { usePosterStore } from '@/store/poster'
+import { IActivity } from '@/interface/canvas'
 const posterStore = usePosterStore()
 
 const showPanel = ref(false)
@@ -55,7 +56,7 @@ const closePanel = () => {
   showPanel.value = false
 }
 
-const operation = ref('')
+const operation = ref<IActivity>(null)
 
 watch(
   () => posterStore.activity,
@@ -79,7 +80,7 @@ watch(
   position: absolute;
   background-color: #fff;
   top: 0;
-  z-index: 5;
+  z-index: -1;
   border-right: 1px solid #ddd;
   padding: 20px;
   .close {

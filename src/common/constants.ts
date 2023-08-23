@@ -1,7 +1,9 @@
+import { IForm, IActivity } from "@/interface/canvas"
+
 /**
  * @description 左侧工具栏
  */
-export const OPERATION = {
+export const OPERATION: {[key: string]: { v: IActivity, l: string }} = {
   FORM: { v: 'form', l: '形状' },
   CUT: { v: 'cut', l: '裁剪' },
   TEXT: { v: 'text', l: '文本' },
@@ -28,7 +30,7 @@ export const LINE_CAP = {
 /**
  * @description 形状
  */
-export const FORM = {
+export const FORM: {[key: string]: { v: IForm, l: string }} = {
   CIRCLE: { v: 'circle', l: '圆形' },
   ELLIPSE: { v: 'ellipse', l: '椭圆' },
   STRAIGHT: { v: 'straight', l: '三角形' },
