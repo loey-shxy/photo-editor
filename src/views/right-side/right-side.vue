@@ -67,12 +67,18 @@
           </div>
           <div class="canvas-list">
             <div 
-              :class="['canvas-item', canvasSelected?.uid === item.uid && 'selected']" 
+              :class="['canvas-item', item.selected && 'selected']" 
               v-for="item in canvasStore.canvasList.toReversed()" 
               :key="item.uid"
               @click="selectCanvas(item)"
             >
-              <div class="canvas-item_form"></div>
+              <div class="canvas-item_form">
+                <div class="rectangle" v-if="item.rectangle"></div>
+                <div class="circle" v-if="item.circle"></div>
+                <div class="img" v-if="item.file">
+                  <img :src="item.file.path" alt="">
+                </div>
+              </div>
               <div class="canvas-item_name">{{ item.name }}</div>
               <el-icon 
                 :size="16"
@@ -94,9 +100,10 @@
 </template>
   
 <script setup lang='ts'>
-import { DocumentAdd, DeleteFilled, Lock, Unlock } from '@element-plus/icons-vue';
+import { DocumentAdd, DeleteFilled, Lock, Unlock } from '@element-plus/icons-vue'
+import { ElMessage } from 'element-plus'
 import { useCanvasStore } from '@/store/canvas'
-import { Canvas } from '@/interface/canvas';
+import { Canvas } from '@/interface/canvas'
 
 const canvasStore = useCanvasStore()
 const size = reactive({
@@ -114,23 +121,39 @@ const changeBackgroundColor = () => {
 
 let canvasSelected = ref<Canvas>({} as Canvas)
 const selectCanvas = (canvas: Canvas) => {
-  canvasSelected.value = canvas
+  const selected = !canvas.selected
+  canvasStore.changeSelected(canvas, selected)
+  if (selected) {
+    canvasSelected.value = canvas
+  }
 }
 
 const addCanvas = () => {
-  canvasStore.canvasPush({
+  canvasStore.push({
     uid: Date.now()
   })
 }
 
 const delCanvas = () => {
-  if (!canvasSelected) {
+  if (!canvasSelected.value.uid) {
+    ElMessage({
+      message: '未选中图层！',
+      type: 'warning',
+    })
+    return
+  }
+
+  if (canvasSelected.value.lock) {
+    ElMessage({
+      message: '选中图层已锁定，不可删除！',
+      type: 'warning',
+    })
     return
   }
 
   const index = canvasStore.canvasList.findIndex(item => item.uid === canvasSelected.value.uid)
   if (index >= 0 ) {
-    canvasStore.canvasSplice(index)
+    canvasStore.splice(index)
   }
 }
 
@@ -138,7 +161,7 @@ const unlockCanvas = () => {
   const index = canvasStore.canvasList.findIndex(item => item.uid === canvasSelected.value.uid)
   canvasSelected.value.lock = false
   if (index >= 0) {
-    canvasStore.canvasSplice(index, canvasSelected.value)
+    canvasStore.splice(index, canvasSelected.value)
   }
 }
 
@@ -146,7 +169,7 @@ const lockCanvas = () => {
   const index = canvasStore.canvasList.findIndex(item => item.uid === canvasSelected.value.uid)
   canvasSelected.value.lock = true
   if (index >= 0) {
-    canvasStore.canvasSplice(index, canvasSelected.value)
+    canvasStore.splice(index, canvasSelected.value)
   }
 }
 
@@ -173,35 +196,38 @@ const lockCanvas = () => {
   }
 
   .canvas-wrap {
-    max-height: 300px;
-    overflow-y: auto;
     padding: 10px 10px 30px;
     background-color: #fafafa;
     position: relative;
+    box-sizing: border-box;
 
-    &::-webkit-scrollbar {
-      width: 2px;
-    }
-    &::-webkit-scrollbar-button {
-      display: none;
-    }
-    &::-webkit-scrollbar-track {
-      background: transparent;
-    }
-    &::-webkit-scrollbar-track-piece {
-      background-color: rgba(193, 203, 198, 0.3);
-    }
-    &::-webkit-scrollbar-thumb {
-      background: #6abae8;
-      cursor: pointer;
-      border-radius: 3px;
-      width: 2px;
-    }
-    &::-webkit-scrollbar-corner {
-      display: none;
-    }
-    &::-webkit-resizer {
-      display: none;
+    .canvas-list {
+      max-height: 300px;
+      overflow-y: auto;
+      &::-webkit-scrollbar {
+        width: 2px;
+      }
+      &::-webkit-scrollbar-button {
+        display: none;
+      }
+      &::-webkit-scrollbar-track {
+        background: transparent;
+      }
+      &::-webkit-scrollbar-track-piece {
+        background-color: rgba(193, 203, 198, 0.3);
+      }
+      &::-webkit-scrollbar-thumb {
+        background: #6abae8;
+        cursor: pointer;
+        border-radius: 3px;
+        width: 2px;
+      }
+      &::-webkit-scrollbar-corner {
+        display: none;
+      }
+      &::-webkit-resizer {
+        display: none;
+      }
     }
     .canvas-item {
       display: flex;
@@ -221,11 +247,33 @@ const lockCanvas = () => {
         width: 40%;
         height: 30px;
         border: 1px solid #ddd;
+        display: flex;
+        align-items: center;
+        justify-content: flex-start;
+        padding-left: 10px;
       }
       &_name {
         flex: 1;
         padding-left: 16px;
         font-size: 12px;
+      }
+      .rectangle {
+        width: 60%;
+        height: 20px;
+        border: 1px solid #ddd;
+      }
+
+      .circle {
+        width: 20px;
+        height: 20px;
+        border-radius: 50%;
+        border: 1px solid #ddd;
+      }
+
+      .img {
+        img {
+          height: 20px;
+        }
       }
     }
 

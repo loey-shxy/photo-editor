@@ -32,15 +32,6 @@ export default function useRectangle() {
         if (start) {
           ctx.clearRect(0, 0, canvas.width, canvas.height)
           redraw()
-          ctx.beginPath()
-          ctx.setLineDash([8, formStore.borderStyle === LINE_STYLES.DASHED.v ? 4 : 0])
-          ctx.strokeStyle = formStore.borderColor
-          ctx.fillStyle = formStore.fillColor
-          ctx.lineWidth = formStore.borderWidth
-          ctx.rect(startX, startY, em.offsetX - startX, em.offsetY - startY)
-          ctx.fillRect(startX, startY, em.offsetX - startX, em.offsetY - startY)
-          ctx.stroke()
-
           rectangle = {
             x: startX,
             y: startY,
@@ -51,6 +42,16 @@ export default function useRectangle() {
             fc: formStore.fillColor,
             bw: formStore.borderWidth
           }
+
+          ctx.beginPath()
+          ctx.setLineDash([8, rectangle.bs === LINE_STYLES.DASHED.v ? 4 : 0])
+          ctx.strokeStyle = rectangle.bc
+          ctx.fillStyle = rectangle.fc as string
+          ctx.lineWidth = rectangle.bw
+          ctx.rect(rectangle.x, rectangle.y, rectangle.w, rectangle.h)
+          ctx.fillRect(rectangle.x, rectangle.y, rectangle.w, rectangle.h)
+          ctx.stroke()
+          
         }
       }
     }
@@ -58,7 +59,7 @@ export default function useRectangle() {
     canvas.onmouseup = () => {
       start = false
       const uid = Date.now()
-      canvasStore.canvasPush({ uid, rectangle })
+      canvasStore.push({ uid, rectangle })
       ctx.clearRect(0, 0, canvas.width, canvas.height)
       nextTick(() => {
         redraw()
@@ -70,16 +71,16 @@ export default function useRectangle() {
     canvasStore.canvasList.forEach(item => {
       if (!isEmpty(item) && !isEmpty(item.rectangle))  {
         const cav = document.querySelector(`#canvas${item.uid}`) as HTMLCanvasElement
-        const c = cav.getContext('2d') as CanvasRenderingContext2D
+        const context = cav.getContext('2d') as CanvasRenderingContext2D
         const rect = item.rectangle
-        c.beginPath()
-        c.strokeStyle = rect.bc
-        c.lineWidth = rect.bw
-        c.setLineDash([8, rect.bs === LINE_STYLES.DASHED.v ? 4 : 0])
-        c.fillStyle = rect.fc
-        c.rect(rect.x, rect.y, rect.w, rect.h)
-        c.fillRect(rect.x, rect.y, rect.w, rect.h)
-        c.stroke()
+        context.beginPath()
+        context.strokeStyle = rect.bc
+        context.lineWidth = rect.bw
+        context.setLineDash([8, rect.bs === LINE_STYLES.DASHED.v ? 4 : 0])
+        context.fillStyle = rect.fc as string
+        context.rect(rect.x, rect.y, rect.w, rect.h)
+        context.fillRect(rect.x, rect.y, rect.w, rect.h)
+        context.stroke()
       }
     })
   }

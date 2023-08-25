@@ -10,15 +10,17 @@
       <!-- 绘画层 -->
       <canvas
         class="canvas"
+        style="z-index: 9999;"
         :width="canvasStore.width"
         :height="canvasStore.height"
         id="canvas"
-        v-if="posterStore.activity === OPERATION.FORM.v"
+        v-if="posterStore.activity === OPERATION.FORM.v && notSelected"
       ></canvas>
       <!-- 图层 -->
       <canvas 
-        v-for="canvas in canvasStore.canvasList"
+        v-for="(canvas, index) in canvasStore.canvasList.toReversed()"
         :key="canvas.uid"
+        :style="{ zIndex: canvas.selected ? 9000 : canvasStore.canvasList.length - index}"
         :width="canvasStore.width"
         :height="canvasStore.height"
         class="canvas"
@@ -28,13 +30,6 @@
 </template>
 <script setup lang='ts'>
 import { FORM, OPERATION } from '@/common/constants'
-
-import useRectangle from '@/hooks/draw-rectangle'
-const { drawForm } = useRectangle()
-
-import useLine from '@/hooks/draw-line'
-const { drawLine } = useLine()
-
 import { useCanvasStore } from '@/store/canvas'
 const canvasStore = useCanvasStore()
 
@@ -44,32 +39,57 @@ const posterStore = usePosterStore()
 import { useFormStore } from '@/store/form'
 const formStore = useFormStore()
 
+import useRectangle from '@/hooks/draw-rectangle'
+const { drawForm } = useRectangle()
+
+import useLine from '@/hooks/draw-line'
+const { drawLine } = useLine()
+
+import useCircle from '@/hooks/draw-circle'
+import { every } from 'lodash';
+import { Canvas } from '@/interface/canvas';
+const { drawCircle } = useCircle()
+
+const notSelected = computed(() => {
+  return every(canvasStore.canvasList, item => !item.selected)
+})
+
 watch(
   () => [formStore.form, posterStore.activity],
   () => {
     // 绘制矩形
-    if (posterStore.activity === OPERATION.FORM.v && formStore.form === FORM.RECTANGLE.v) {
-      const canvas = document.querySelector('#canvas') as HTMLCanvasElement
-      const ctx = canvas.getContext('2d') as CanvasRenderingContext2D
-      canvas.width = canvasStore.width
-      canvas.height = canvasStore.height
-
-      drawForm(canvas, ctx)
+    if (posterStore.activity === OPERATION.FORM.v) {
+      nextTick(() => {
+        const canvas = document.querySelector('#canvas') as HTMLCanvasElement
+        const ctx = canvas.getContext('2d') as CanvasRenderingContext2D
+        canvas.width = canvasStore.width
+        canvas.height = canvasStore.height
+  
+        if (formStore.form === FORM.RECTANGLE.v) {
+          drawForm(canvas, ctx)
+        }
+        if (formStore.form === FORM.CIRCLE.v) {
+          drawCircle(canvas, ctx)
+        }
+      })
     }
 
     // 画笔
     if (posterStore.activity === OPERATION.BRUSH.v) {
-      const last = canvasStore.canvasList[canvasStore.canvasList.length-1]
-      let id = last ? last.uid : Date.now()
-      if (!canvasStore.canvasList.length || last.rectangle || last.text) {
-        id = Date.now()
-        canvasStore.canvasPush({
-          uid: id,
+      let uid = Date.now() 
+      let selectedCanvas = canvasStore.canvasList[canvasStore.canvasList.length-1]
+      if (!notSelected) {
+        selectedCanvas = canvasStore.canvasList.find(item => item.selected) as Canvas
+      }
+      if (!canvasStore.canvasList.length || selectedCanvas.rectangle || selectedCanvas.text || notSelected) {
+        uid = Date.now()
+        canvasStore.push({
+          uid,
         })
       }
 
       nextTick(() => {
-        const cav = document.querySelector(`#canvas${id}`) as HTMLCanvasElement
+        const cav = document.querySelector(`#canvas${uid}`) as HTMLCanvasElement
         const c = cav.getContext('2d') as CanvasRenderingContext2D
         drawLine(cav, c)
       })
@@ -78,7 +98,7 @@ watch(
 )
 
 </script>
-  
+
 <style lang="scss" scoped>
 .workspace {
   position: relative;
@@ -89,9 +109,7 @@ watch(
     right: 0;
     bottom: 0;
     background-color: transparent;
-    &:first-child {
-      z-index: 999;
-    }
+    
   }
 }
 </style>

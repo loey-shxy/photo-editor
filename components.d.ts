@@ -19,6 +19,7 @@ declare module 'vue' {
     ElSlider: typeof import('element-plus/es')['ElSlider']
     ElSwitch: typeof import('element-plus/es')['ElSwitch']
     ElTooltip: typeof import('element-plus/es')['ElTooltip']
+    ElUpload: typeof import('element-plus/es')['ElUpload']
     Header: typeof import('./src/components/header/header.vue')['default']
     LeftSide: typeof import('./src/components/left-side/left-side.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']

@@ -5,9 +5,17 @@
           <img src="@/assets/images/logo.png" alt="">
         </div>
         <el-divider direction="vertical" />
-        <el-button type="text">
-          导入文件
-        </el-button>
+        <el-upload
+          ref="uploadRef"
+          action=""
+          multiple
+          :show-file-list="false"
+          :auto-upload="false"
+          :on-change="uploadChange"
+          accept="image/*"
+        >
+          <el-button type="primary">导入文件</el-button>
+        </el-upload>
         <el-divider direction="vertical" />
         <el-tooltip
           effect="dark"
@@ -31,8 +39,27 @@
   
 <script setup lang='ts' name="editor-header">
 import { ref } from 'vue'
+import { ElMessage } from 'element-plus'
+import type { UploadFile, UploadProps, UploadInstance } from 'element-plus';
+
+const uploadRef = ref<UploadInstance>()
+import useImage from '@/hooks/draw-image'
+const { drawImage } = useImage()
 
 const guides = ref(false)
+
+const uploadChange: UploadProps['onChange'] = (uploadFile: UploadFile) => {
+  if (!/image\/\w+/.test(uploadFile.raw?.type as string)) {
+    ElMessage({
+      message: '请上传图片！',
+      type: 'warning'
+    })
+    uploadRef.value?.clearFiles()
+    return
+  }
+  console.log(uploadFile)
+  drawImage(uploadFile.raw as File)
+}
 </script>
   
 <style lang="scss" scoped>
