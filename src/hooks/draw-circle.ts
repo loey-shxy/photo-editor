@@ -14,8 +14,8 @@ export default function useCircle() {
     canvas: HTMLCanvasElement,
     ctx: CanvasRenderingContext2D
   ) => {
+    let uid: number, start = false, startX = 0, startY = 0;
     canvas.style.cursor = 'crosshair'
-    let start = false, startX = 0, startY = 0;
     ctx.fillStyle = 'rgba(0, 0, 0, 0)'
     ctx.fillRect(0, 0, canvas.width, canvas.height)
 
@@ -23,6 +23,7 @@ export default function useCircle() {
       start = true
       startX = ed.offsetX
       startY = ed.offsetY
+      uid = Date.now()
 
       canvas.onmousemove = (em: MouseEvent) => {
         if (start) {
@@ -40,7 +41,7 @@ export default function useCircle() {
             anticlockwise: true
           }
           ctx.clearRect(0, 0, canvas.width, canvas.height)
-          redraw()
+          redraw(uid)
           ctx.beginPath()
           ctx.strokeStyle = circle.bc
           ctx.lineWidth = circle.bw
@@ -55,18 +56,17 @@ export default function useCircle() {
 
     canvas.onmouseup = () => {
       start = false
-      const uid = Date.now()
       canvasStore.push({ uid, circle })
       ctx.clearRect(0, 0, canvas.width, canvas.height)
       nextTick(() => {
-        redraw()
+        redraw(uid)
       })
     }
   }
 
-  const redraw = () => {
+  const redraw = (uid: number) => {
     canvasStore.canvasList.forEach(item => {
-      if (!isEmpty(item) && !isEmpty(item.circle)) {
+      if (!isEmpty(item) && !isEmpty(item.circle) && item.uid === uid) {
         const cav = document.querySelector(`#canvas${item.uid}`) as HTMLCanvasElement
         const context = cav.getContext('2d') as CanvasRenderingContext2D
         const circle = item.circle

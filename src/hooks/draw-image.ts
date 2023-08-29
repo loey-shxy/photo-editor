@@ -1,13 +1,27 @@
 import { File } from '@/interface/canvas'
+import { getDistance } from '@/utils/position'
 import { useCanvasStore } from '@/store/canvas'
 const canvasStore = useCanvasStore()
 
+const DRAG_STATUS = {
+  IDLE: 0, // 拖拽开始
+  DRAG_START: 1, // 拖拽中
+  DRAGGING: 2 // 拖拽结束
+}
+
 export default function useImage() {
-  let startX = 0, 
-      startY = 0, 
-      uid = 0, 
-      isMoving = false,
-      image = {} as File
+  let uid = 0, 
+      dragStatus = DRAG_STATUS.IDLE,
+      image: File = {
+        x: 0,
+        y: 0,
+        width: 0,
+        height: 0,
+        path: '',
+        img: null
+      },
+      lastEvtPos: { x: number, y: number }, // 计算偏移量坐标
+      offsetEvtPos: { x: number, y: number} // 偏移事件位置
 
   const drawImage = (
     file: Blob
@@ -19,25 +33,27 @@ export default function useImage() {
     nextTick(() => {
       const canvas = document.querySelector(`#canvas${uid}`) as HTMLCanvasElement
       const ctx = canvas.getContext('2d') as CanvasRenderingContext2D
-      
-      newDraw(canvas, ctx, file)
-      
-      canvas.onmousedown = (ed: MouseEvent) => {
-        startX = ed.offsetX
-        startY = ed.offsetY
 
-        if (startX > image.x && startX < image.x + image.width 
-          && image.y < startY && startY < image.y + image.height) {
-          isMoving = true
-          moveImage(canvas, ctx, startX, startY)
+      newDraw(canvas, ctx, file)
+
+      canvas.onmousedown = (ed: MouseEvent) => {
+        if (ed.offsetX > image.x && ed.offsetX < image.x + image.width 
+          && image.y < ed.offsetY && ed.offsetY < image.y + image.height) {
+          dragStatus = DRAG_STATUS.DRAG_START
+          
+          lastEvtPos = { x: ed.offsetX, y: ed.offsetY }
+          offsetEvtPos = { x: ed.offsetX, y: ed.offsetY }
+          moveImage(canvas, ctx)
         }
       }
       canvas.onmouseup = () => {
-        isMoving = false
+        dragStatus = DRAG_STATUS.IDLE
+        canvas.style.cursor = ''
       }
 
       canvas.onmouseout = () => {
-        isMoving = false
+        dragStatus = DRAG_STATUS.IDLE
+        canvas.style.cursor = ''
       }
     })
   }
@@ -56,7 +72,6 @@ export default function useImage() {
       img.onload = () => {
         const width = 100
         const height = (width / img.width) * img.height
-  
         image = {
           x: 0,
           y: 0,
@@ -66,15 +81,13 @@ export default function useImage() {
           img
         }
         draw(canvas, ctx, image)
-      }
-
-      const index = canvasStore.canvasList.findIndex(item => item.uid === uid)
-      console.log(index, image);
-      if (index >= 0) {
-        canvasStore.splice(index, {
-          ...canvasStore.canvasList[index],
-          file: image
-        })
+        const index = canvasStore.canvasList.findIndex(item => item.uid === uid)
+        if (index >= 0) {
+          canvasStore.splice(index, {
+            ...canvasStore.canvasList[index],
+            file: image
+          })
+        }
       }
     }
   }
@@ -85,36 +98,42 @@ export default function useImage() {
     image: File
   ) => {
     ctx.clearRect(0, 0, canvas.width, canvas.height)
-    ctx.drawImage(image.img, image.x, image.y, image.width, image.height)
+    ctx.drawImage(image.img as HTMLImageElement, image.x, image.y, image.width, image.height)
   }
 
   const moveImage = (
     canvas: HTMLCanvasElement,
-    ctx: CanvasRenderingContext2D,
-    startX: number,
-    startY: number
+    ctx: CanvasRenderingContext2D
   ) => {
     canvas.onmousemove = (em: MouseEvent) => {
-      if (!isMoving) {
-        return
-      }
-      const [dx, dy] = [em.offsetX - startX, em.offsetY - startY]
-      
-      image = {
-        ...image,
-        x: image.x + dx,
-        y: image.y + dy
-      }
-      
-      draw(canvas, ctx, image)
-    }
+      canvas.style.cursor = 'move'
+      const position = getPosition(em)
+      if (dragStatus === DRAG_STATUS.DRAG_START && getDistance(position, lastEvtPos) > 5) {
+        dragStatus = DRAG_STATUS.DRAGGING
+        offsetEvtPos = position
+      } else if (dragStatus === DRAG_STATUS.DRAGGING) {
+        const [dx, dy] = [position.x - offsetEvtPos.x, position.y - offsetEvtPos.y]
 
-    canvas.onmouseup = () => {
-      isMoving = false
+        image = {
+          ...image,
+          x: image.x + dx,
+          y: image.y + dy
+        }
+
+        draw(canvas, ctx, image)
+        offsetEvtPos = position
+      }
     }
   }
 
   return {
     drawImage
+  }
+}
+
+const getPosition = (e: MouseEvent) => {
+  return {
+    x: e.offsetX,
+    y: e.offsetY
   }
 }

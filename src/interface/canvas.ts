@@ -43,7 +43,7 @@ export interface File {
   y: number
   width: number
   height: number,
-  img: HTMLImageElement
+  img: HTMLImageElement | null
 }
 
 /**
@@ -87,4 +87,9 @@ export interface ICircle extends BrushStyle {
   startAngle: number // 开始角度
   endAngle: number // 结束角度
   anticlockwise: boolean // 是否顺时针
+}
+
+export interface Position {
+  x: number
+  y: number
 }
