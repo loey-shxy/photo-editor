@@ -39,8 +39,11 @@ export interface Canvas {
 
 export interface File {
   path: string
+  x: number
+  y: number
   width: number
-  height: number
+  height: number,
+  img: HTMLImageElement
 }
 
 /**

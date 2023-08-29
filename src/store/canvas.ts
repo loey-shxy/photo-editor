@@ -64,6 +64,10 @@ export const useCanvasStore = defineStore('canvas', {
           selected
         })
       }
+    },
+
+    clearCanvas() {
+      this.canvasList = []
     }
   }
 })

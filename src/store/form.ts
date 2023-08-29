@@ -6,7 +6,7 @@ interface IFormStore {
   borderStyle: string
   borderWidth: number
   borderColor: string
-  fillColor: string
+  fillColor: string | null
 }
 
 export const useFormStore = defineStore('form', {
@@ -16,7 +16,7 @@ export const useFormStore = defineStore('form', {
       borderStyle: '',
       borderWidth: 1,
       borderColor: '#000',
-      fillColor: '#fff'
+      fillColor: null
     }
   },
 

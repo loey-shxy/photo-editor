@@ -39,14 +39,14 @@ export default function useRectangle() {
             h: em.offsetY - startY,
             bs: formStore.borderStyle,
             bc: formStore.borderColor,
-            fc: formStore.fillColor,
+            fc: formStore.fillColor as string,
             bw: formStore.borderWidth
           }
 
           ctx.beginPath()
           ctx.setLineDash([8, rectangle.bs === LINE_STYLES.DASHED.v ? 4 : 0])
           ctx.strokeStyle = rectangle.bc
-          ctx.fillStyle = rectangle.fc as string
+          ctx.fillStyle = rectangle.fc ? rectangle.fc as string : 'rgba(0,0,0,0)'
           ctx.lineWidth = rectangle.bw
           ctx.rect(rectangle.x, rectangle.y, rectangle.w, rectangle.h)
           ctx.fillRect(rectangle.x, rectangle.y, rectangle.w, rectangle.h)
@@ -77,7 +77,7 @@ export default function useRectangle() {
         context.strokeStyle = rect.bc
         context.lineWidth = rect.bw
         context.setLineDash([8, rect.bs === LINE_STYLES.DASHED.v ? 4 : 0])
-        context.fillStyle = rect.fc as string
+        context.fillStyle = rectangle.fc ? rectangle.fc as string : 'rgba(0,0,0,0)'
         context.rect(rect.x, rect.y, rect.w, rect.h)
         context.fillRect(rect.x, rect.y, rect.w, rect.h)
         context.stroke()

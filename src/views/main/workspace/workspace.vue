@@ -2,7 +2,7 @@
     <div 
     class="workspace"
     :style="{
-      backgroundColor: canvasStore.backgroundColor,
+      backgroundColor: canvasStore.backgroundColor ? canvasStore.backgroundColor : '#fff',
       width: canvasStore.width + 'px',
       height: canvasStore.height + 'px'
     }"
@@ -10,17 +10,16 @@
       <!-- 绘画层 -->
       <canvas
         class="canvas"
-        style="z-index: 9999;"
+        :style="{zIndex: posterStore.activity === OPERATION.FORM.v || notSelected ? 999 : -2 }"
         :width="canvasStore.width"
         :height="canvasStore.height"
         id="canvas"
-        v-if="posterStore.activity === OPERATION.FORM.v && notSelected"
       ></canvas>
       <!-- 图层 -->
       <canvas 
         v-for="(canvas, index) in canvasStore.canvasList.toReversed()"
         :key="canvas.uid"
-        :style="{ zIndex: canvas.selected ? 9000 : canvasStore.canvasList.length - index}"
+        :style="{ zIndex: canvas.selected ? 998 : canvasStore.canvasList.length - index}"
         :width="canvasStore.width"
         :height="canvasStore.height"
         class="canvas"

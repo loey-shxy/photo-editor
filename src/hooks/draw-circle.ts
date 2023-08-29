@@ -36,7 +36,7 @@ export default function useCircle() {
             bw: formStore.borderWidth,
             bc: formStore.borderColor,
             bs: formStore.borderStyle,
-            fc: formStore.fillColor,
+            fc: formStore.fillColor as string,
             anticlockwise: true
           }
           ctx.clearRect(0, 0, canvas.width, canvas.height)
@@ -45,7 +45,7 @@ export default function useCircle() {
           ctx.strokeStyle = circle.bc
           ctx.lineWidth = circle.bw
           ctx.setLineDash([8, circle.bs === LINE_STYLES.DASHED.v ? 4 : 0])
-          ctx.fillStyle = circle.fc as string
+          ctx.fillStyle = circle.fc ? circle.fc as string : 'rgba(0,0,0,0)'
           ctx.arc(circle.x, circle.y, circle.radius, circle.startAngle, circle.endAngle, circle.anticlockwise)
           ctx.fill()
           ctx.stroke()
@@ -74,7 +74,7 @@ export default function useCircle() {
         context.strokeStyle = circle.bc
         context.lineWidth = circle.bw
         context.setLineDash([8, circle.bs === LINE_STYLES.DASHED.v ? 4 : 0])
-        context.fillStyle = circle.fc as string
+        context.fillStyle = circle.fc ? circle.fc as string : 'rgba(0,0,0,0)'
         context.arc(circle.x, circle.y, circle.radius, 0, Math.PI * 2, true)
         context.fill()
         context.stroke()
