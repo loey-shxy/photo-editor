@@ -9,3 +9,10 @@ import { Position } from '@/interface/canvas'
 export const getDistance = (p1: Position, p2: Position) => {
   return Math.sqrt((p1.x - p2.x) ** 2 + (p1.y - p2.y) ** 2)
 }
+
+export const getPosition = (e: MouseEvent) => {
+  return {
+    x: e.offsetX,
+    y: e.offsetY
+  }
+}

@@ -60,10 +60,8 @@ export interface IRectangle extends BrushStyle {
  * @description 线条
  */
 export interface ILine {
-  sx: number // 起点x
-  sy: number // 起点y
-  ex: number // 终点x
-  ey: number // 终点y
+  x: number // 起点x
+  y: number // 起点y
 }
 
 /**

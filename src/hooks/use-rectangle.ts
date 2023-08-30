@@ -13,27 +13,36 @@ export default function useRectangle() {
    * @param canvas 
    * @param ctx
    */
-  let rectangle = {} as IRectangle
-  const drawForm = (
-    canvas: HTMLCanvasElement,
-    ctx: CanvasRenderingContext2D,
-  ) => {
-    let uid: number, start = false, startX = 0, startY = 0;
+  const rectangle = ref<IRectangle>()
+  const cav = shallowRef<HTMLCanvasElement>()
+  const uid = ref<number>(0)
+  const start = ref<boolean>(false)
+
+  onMounted(() => {
+    nextTick(() => {
+      cav.value = document.querySelector('#canvas') as HTMLCanvasElement
+      cav.value.width = canvasStore.width
+      cav.value.height = canvasStore.height
+    })
+  })
+
+  const drawRectangle = () => {
+    const canvas = cav.value as HTMLCanvasElement
+    const ctx = canvas.getContext('2d') as CanvasRenderingContext2D
     canvas.style.cursor = 'crosshair'
     ctx.fillStyle = 'rgba(0, 0, 0, 0)'
     ctx.fillRect(0, 0, canvas.width, canvas.height)
 
     canvas.onmousedown = (ed: MouseEvent) => {
-      uid = Date.now()
-      start = true
-      startX = ed.offsetX
-      startY = ed.offsetY
+      uid.value = Date.now()
+      start.value = true
+      const [startX, startY] = [ed.offsetX, ed.offsetY]
       
       canvas.onmousemove =  (em: MouseEvent) => {
-        if (start) {
+        if (start.value) {
           ctx.clearRect(0, 0, canvas.width, canvas.height)
-          redraw(uid)
-          rectangle = {
+          redraw(uid.value)
+          rectangle.value = {
             x: startX,
             y: startY,
             w: em.offsetX - startX,
@@ -45,12 +54,12 @@ export default function useRectangle() {
           }
 
           ctx.beginPath()
-          ctx.setLineDash([8, rectangle.bs === LINE_STYLES.DASHED.v ? 4 : 0])
-          ctx.strokeStyle = rectangle.bc
-          ctx.fillStyle = rectangle.fc ? rectangle.fc as string : 'rgba(0,0,0,0)'
-          ctx.lineWidth = rectangle.bw
-          ctx.rect(rectangle.x, rectangle.y, rectangle.w, rectangle.h)
-          ctx.fillRect(rectangle.x, rectangle.y, rectangle.w, rectangle.h)
+          ctx.setLineDash([8, rectangle.value.bs === LINE_STYLES.DASHED.v ? 4 : 0])
+          ctx.strokeStyle = rectangle.value.bc
+          ctx.fillStyle = rectangle.value.fc ? rectangle.value.fc as string : 'rgba(0,0,0,0)'
+          ctx.lineWidth = rectangle.value.bw
+          ctx.rect(rectangle.value.x, rectangle.value.y, rectangle.value.w, rectangle.value.h)
+          ctx.fillRect(rectangle.value.x, rectangle.value.y, rectangle.value.w, rectangle.value.h)
           ctx.stroke()
           
         }
@@ -58,11 +67,11 @@ export default function useRectangle() {
     }
 
     canvas.onmouseup = () => {
-      start = false
-      canvasStore.push({ uid, rectangle })
+      start.value = false
+      canvasStore.push({ uid: uid.value, rectangle: rectangle.value })
       ctx.clearRect(0, 0, canvas.width, canvas.height)
       nextTick(() => {
-        redraw(uid)
+        redraw(uid.value)
       })
     }
   }
@@ -70,14 +79,14 @@ export default function useRectangle() {
   const redraw = (uid: number) => {
     canvasStore.canvasList.forEach(item => {
       if (!isEmpty(item) && !isEmpty(item.rectangle) && item.uid === uid)  {
-        const cav = document.querySelector(`#canvas${item.uid}`) as HTMLCanvasElement
-        const context = cav.getContext('2d') as CanvasRenderingContext2D
+        const canvas = document.querySelector(`#canvas${item.uid}`) as HTMLCanvasElement
+        const context = canvas.getContext('2d') as CanvasRenderingContext2D
         const rect = item.rectangle
         context.beginPath()
         context.strokeStyle = rect.bc
         context.lineWidth = rect.bw
         context.setLineDash([8, rect.bs === LINE_STYLES.DASHED.v ? 4 : 0])
-        context.fillStyle = rectangle.fc ? rectangle.fc as string : 'rgba(0,0,0,0)'
+        context.fillStyle = rect.fc ? rect.fc as string : 'rgba(0,0,0,0)'
         context.rect(rect.x, rect.y, rect.w, rect.h)
         context.fillRect(rect.x, rect.y, rect.w, rect.h)
         context.stroke()
@@ -86,6 +95,6 @@ export default function useRectangle() {
   }
 
   return {
-    drawForm
+    drawRectangle
   }
 }

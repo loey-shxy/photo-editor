@@ -9,26 +9,35 @@ import { useCanvasStore } from '@/store/canvas'
 const canvasStore = useCanvasStore()
 
 export default function useCircle() {
-  let circle = {} as ICircle
-  const drawCircle = (
-    canvas: HTMLCanvasElement,
-    ctx: CanvasRenderingContext2D
-  ) => {
-    let uid: number, start = false, startX = 0, startY = 0;
+  let circle = ref<ICircle>()
+  const cav = shallowRef<HTMLCanvasElement>()
+  const uid = ref<number>(0)
+  const start = ref<boolean>(false)
+
+  onMounted(() => {
+    nextTick(() => {
+      cav.value = document.querySelector('#canvas') as HTMLCanvasElement
+      cav.value.width = canvasStore.width
+      cav.value.height = canvasStore.height
+    })
+  })
+
+  const drawCircle = () => {
+    const canvas = cav.value as HTMLCanvasElement
+    const ctx = canvas.getContext('2d') as CanvasRenderingContext2D
+
     canvas.style.cursor = 'crosshair'
     ctx.fillStyle = 'rgba(0, 0, 0, 0)'
     ctx.fillRect(0, 0, canvas.width, canvas.height)
 
     canvas.onmousedown = (ed: MouseEvent) => {
-      start = true
-      startX = ed.offsetX
-      startY = ed.offsetY
-      uid = Date.now()
-
+      start.value = true
+      uid.value = Date.now()
+      const [startX, startY] = [ed.offsetX, ed.offsetY]
       canvas.onmousemove = (em: MouseEvent) => {
-        if (start) {
+        if (start.value) {
           const radius = Math.sqrt(Math.pow(em.offsetX - startX, 2) + Math.pow(em.offsetY - startY, 2))
-          circle = {
+          circle.value = {
             x: startX,
             y: startY,
             radius,
@@ -41,13 +50,13 @@ export default function useCircle() {
             anticlockwise: true
           }
           ctx.clearRect(0, 0, canvas.width, canvas.height)
-          redraw(uid)
+          redraw(uid.value)
           ctx.beginPath()
-          ctx.strokeStyle = circle.bc
-          ctx.lineWidth = circle.bw
-          ctx.setLineDash([8, circle.bs === LINE_STYLES.DASHED.v ? 4 : 0])
-          ctx.fillStyle = circle.fc ? circle.fc as string : 'rgba(0,0,0,0)'
-          ctx.arc(circle.x, circle.y, circle.radius, circle.startAngle, circle.endAngle, circle.anticlockwise)
+          ctx.strokeStyle = circle.value.bc
+          ctx.lineWidth = circle.value.bw
+          ctx.setLineDash([8, circle.value.bs === LINE_STYLES.DASHED.v ? 4 : 0])
+          ctx.fillStyle = circle.value.fc ? circle.value.fc as string : 'rgba(0,0,0,0)'
+          ctx.arc(circle.value.x, circle.value.y, circle.value.radius, circle.value.startAngle, circle.value.endAngle, circle.value.anticlockwise)
           ctx.fill()
           ctx.stroke()
         }
@@ -55,11 +64,11 @@ export default function useCircle() {
     }
 
     canvas.onmouseup = () => {
-      start = false
-      canvasStore.push({ uid, circle })
+      start.value = false
+      canvasStore.push({ uid: uid.value, circle: circle.value })
       ctx.clearRect(0, 0, canvas.width, canvas.height)
       nextTick(() => {
-        redraw(uid)
+        redraw(uid.value)
       })
     }
   }

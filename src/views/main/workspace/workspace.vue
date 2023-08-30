@@ -28,7 +28,9 @@
     </div>
 </template>
 <script setup lang='ts'>
+import { every } from 'lodash'
 import { FORM, OPERATION } from '@/common/constants'
+
 import { useCanvasStore } from '@/store/canvas'
 const canvasStore = useCanvasStore()
 
@@ -38,15 +40,13 @@ const posterStore = usePosterStore()
 import { useFormStore } from '@/store/form'
 const formStore = useFormStore()
 
-import useRectangle from '@/hooks/draw-rectangle'
-const { drawForm } = useRectangle()
+import useRectangle from '@/hooks/use-rectangle'
+const { drawRectangle } = useRectangle()
 
-import useLine from '@/hooks/draw-line'
+import useLine from '@/hooks/use-line'
 const { drawLine } = useLine()
 
-import useCircle from '@/hooks/draw-circle'
-import { every } from 'lodash';
-import { Canvas } from '@/interface/canvas';
+import useCircle from '@/hooks/use-circle'
 const { drawCircle } = useCircle()
 
 const notSelected = computed(() => {
@@ -56,42 +56,20 @@ const notSelected = computed(() => {
 watch(
   () => [formStore.form, posterStore.activity],
   () => {
-    // 绘制矩形
     if (posterStore.activity === OPERATION.FORM.v) {
-      nextTick(() => {
-        const canvas = document.querySelector('#canvas') as HTMLCanvasElement
-        const ctx = canvas.getContext('2d') as CanvasRenderingContext2D
-        canvas.width = canvasStore.width
-        canvas.height = canvasStore.height
-  
-        if (formStore.form === FORM.RECTANGLE.v) {
-          drawForm(canvas, ctx)
-        }
-        if (formStore.form === FORM.CIRCLE.v) {
-          drawCircle(canvas, ctx)
-        }
-      })
+      // 绘制矩形
+      if (formStore.form === FORM.RECTANGLE.v) {
+        drawRectangle()
+      }
+      // 绘制圆形
+      if (formStore.form === FORM.CIRCLE.v) {
+        drawCircle()
+      }
     }
 
-    // 画笔
+    // 绘制线条
     if (posterStore.activity === OPERATION.BRUSH.v) {
-      let uid = Date.now() 
-      let selectedCanvas = canvasStore.canvasList[canvasStore.canvasList.length-1]
-      if (!notSelected) {
-        selectedCanvas = canvasStore.canvasList.find(item => item.selected) as Canvas
-      }
-      if (!canvasStore.canvasList.length || selectedCanvas.rectangle || selectedCanvas.text || notSelected) {
-        uid = Date.now()
-        canvasStore.push({
-          uid,
-        })
-      }
-
-      nextTick(() => {
-        const cav = document.querySelector(`#canvas${uid}`) as HTMLCanvasElement
-        const c = cav.getContext('2d') as CanvasRenderingContext2D
-        drawLine(cav, c)
-      })
+      drawLine()
     }
   }
 )
