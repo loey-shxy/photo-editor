@@ -32,15 +32,13 @@ export interface Canvas {
   line?: ILine
   text?: string
   heart?: IHeart
-  file?: File
+  image?: Image
   lock?: boolean
   selected?: boolean
 }
 
-export interface File {
+export interface Image extends Position {
   path: string
-  x: number
-  y: number
   width: number
   height: number,
   img: HTMLImageElement | null
@@ -49,9 +47,7 @@ export interface File {
 /**
  * @description 矩形
  */
-export interface IRectangle extends BrushStyle {
-  x: number // 起点x坐标
-  y: number // 起点y坐标
+export interface IRectangle extends BrushStyle, Position {
   w: number // 宽
   h: number // 高
 }
@@ -67,9 +63,7 @@ export interface ILine {
 /**
  * @description 心形
  */
-export interface IHeart extends BrushStyle {
-  x: number // 结束点 x 坐标
-  y: number // 结束点 y 坐标
+export interface IHeart extends BrushStyle, Position {
   angle: number
   scaleX: number
   scaleY: number
@@ -78,9 +72,7 @@ export interface IHeart extends BrushStyle {
 /**
  * @description 圆形
  */
-export interface ICircle extends BrushStyle {
-  x: number // 圆心x坐标
-  y: number // 圆心y坐标
+export interface ICircle extends BrushStyle, Position {
   radius: number // 半径
   startAngle: number // 开始角度
   endAngle: number // 结束角度

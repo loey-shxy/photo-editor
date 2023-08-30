@@ -37,3 +37,10 @@ export const FORM: {[key: string]: { v: IForm, l: string }} = {
   RECTANGLE: { v: 'rectangle', l: '矩形' },
   POLYGON: { v: 'polygon', l: '多边形' }
 }
+
+
+export const DRAG_STATUS = {
+  IDLE: 0, // 拖拽开始
+  DRAG_START: 1, // 拖拽中
+  DRAGGING: 2 // 拖拽结束
+}

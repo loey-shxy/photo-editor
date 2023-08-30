@@ -45,11 +45,11 @@ const { uploadChange, uploadRef } = useImage()
 
 import { useCanvasStore } from '@/store/canvas'
 const canvasStore = useCanvasStore()
-const guides = ref(false)
 
 import useDownload from '@/hooks/use-download'
-
 const { saveFile } = useDownload()
+
+const guides = ref(false)
 /**
  * @description 清空画布
  */
